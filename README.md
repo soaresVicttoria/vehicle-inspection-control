@@ -21,8 +21,8 @@ Criar um software de controle de revisões de veículos que permita:
 
 | Categoria          | Tecnologia   | Versão |
 | ------------------ | ------------ | ------ |
-| **Backend**        | PHP          | 8.2+   |
-|                    | Laravel      | 11.x   |
+| **Backend**        | PHP          | 8.4    |
+|                    | Laravel      | 12     |
 |                    | PostgreSQL   | 18     |
 | **Frontend**       | Vue.js       | 3.3    |
 |                    | Bootstrap    | 5.3    |
@@ -30,7 +30,6 @@ Criar um software de controle de revisões de veículos que permita:
 |                    | Axios        | 1.x    |
 | **Infraestrutura** | Docker       | Latest |
 |                    | Laravel Sail | Latest |
-|                    | Nginx        | Latest |
 
 ---
 
@@ -106,7 +105,7 @@ cp .env.example .env
 **5. Acesse a aplicação:**
 
 ```
-http://localhost:8000
+http://localhost:80
 ```
 
 ---
@@ -116,7 +115,7 @@ http://localhost:8000
 ### Base URL
 
 ```
-http://localhost:8000/api
+http://localhost:80/api
 ```
 
 ### Autenticação
