@@ -47,7 +47,7 @@ class ProprietarioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UpdateProprietarioRequest $proprietario)
+    public function update(UpdateProprietarioRequest $request, Proprietario $proprietario)
     {
         $dadosValidados = $request->validated();
 

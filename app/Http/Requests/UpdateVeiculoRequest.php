@@ -22,7 +22,7 @@ class UpdateVeiculoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proprietario_id' => 'sometimes|exist:proprietarios,id',
+            'proprietario_id' => 'sometimes|exists:proprietarios,id',
             'modelo' => 'sometimes|string|max:255',
             'placa' => 'sometimes|string|max:7|unique:veiculos,placa',
             'marca' => 'sometimes|string|max:255'

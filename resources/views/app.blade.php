@@ -203,7 +203,7 @@
                     <!-- Form Modal -->
                     <div v-if="showProprietarioForm" class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Cadastrar Proprietário</h5>
+                            <h5 class="card-title">@{{ proprietarioForm.id ? 'Editar' : 'Cadastrar' }} Proprietário</h5>
                             <form @submit.prevent="salvarProprietario">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -264,6 +264,9 @@
                                     </td>
                                     <td>@{{ formatarData(prop.data_nascimento) }}</td>
                                     <td>
+                                        <button class="btn btn-sm btn-warning me-1" @click="editarProprietario(prop)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-danger" @click="deletarProprietario(prop.id)">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -286,7 +289,7 @@
                     <!-- Form Modal -->
                     <div v-if="showVeiculoForm" class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Cadastrar Veículo</h5>
+                            <h5 class="card-title">@{{ veiculoForm.id ? 'Editar' : 'Cadastrar' }} Veículo</h5>
                             <form @submit.prevent="salvarVeiculo">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -348,6 +351,9 @@
                                     <td><span class="badge bg-secondary">@{{ veiculo.placa }}</span></td>
                                     <td>@{{ veiculo.proprietario ? veiculo.proprietario.nome_completo : 'N/A' }}</td>
                                     <td>
+                                        <button class="btn btn-sm btn-warning me-1" @click="editarVeiculo(veiculo)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-danger" @click="deletarVeiculo(veiculo.id)">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -370,7 +376,7 @@
                     <!-- Form Modal -->
                     <div v-if="showRevisaoForm" class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Registrar Revisão</h5>
+                            <h5 class="card-title">@{{ revisaoForm.id ? 'Editar' : 'Registrar' }} Revisão</h5>
                             <form @submit.prevent="salvarRevisao">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -428,6 +434,9 @@
                                     <td><span class="badge bg-secondary">@{{ revisao.veiculo ? revisao.veiculo.placa : 'N/A' }}</span></td>
                                     <td>@{{ revisao.duracao_minutos }} min</td>
                                     <td>
+                                        <button class="btn btn-sm btn-warning me-1" @click="editarRevisao(revisao)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-danger" @click="deletarRevisao(revisao.id)">
                                             <i class="bi bi-trash"></i>
                                         </button>
@@ -510,42 +519,40 @@
                     currentView: 'dashboard',
                     loading: false,
                     
-                    // Stats
                     stats: {
                         proprietarios: 0,
                         veiculos: 0,
                         revisoes: 0
                     },
                     
-                    // Proprietários
                     proprietarios: [],
                     showProprietarioForm: false,
                     proprietarioForm: {
+                        id: null,
                         nome_completo: '',
                         sexo: '',
                         data_nascimento: ''
                     },
                     
-                    // Veículos
                     veiculos: [],
                     showVeiculoForm: false,
                     veiculoForm: {
+                        id: null,
                         proprietario_id: '',
                         marca: '',
                         modelo: '',
                         placa: ''
                     },
                     
-                    // Revisões
                     revisoes: [],
                     showRevisaoForm: false,
                     revisaoForm: {
+                        id: null,
                         veiculo_id: '',
                         data_revisao: '',
                         duracao_minutos: ''
                     },
                     
-                    // Relatórios
                     relatorioAtual: null,
                     relatorioTitulo: '',
                     chartInstance: null
@@ -602,15 +609,22 @@
                 
                 async salvarProprietario() {
                     try {
-                        await axios.post('/api/proprietarios', this.proprietarioForm);
-                        alert('Proprietário salvo com sucesso!');
+                        if (this.proprietarioForm.id) {
+                            await axios.put(`/api/proprietarios/${this.proprietarioForm.id}`, this.proprietarioForm);
+                            alert('Proprietário atualizado com sucesso!');
+                        } else {
+                            await axios.post('/api/proprietarios', this.proprietarioForm);
+                            alert('Proprietário criado com sucesso!');
+                        }
                         this.cancelarProprietarioForm();
                         this.carregarProprietarios();
+                        this.carregarDashboard();
                     } catch (error) {
                         alert('Erro ao salvar proprietário');
                         console.error(error);
                     }
                 },
+
                 
                 async deletarProprietario(id) {
                     if (confirm('Deseja realmente deletar este proprietário?')) {
@@ -625,9 +639,20 @@
                     }
                 },
                 
+                editarProprietario(proprietario) {
+                    this.proprietarioForm = {
+                        id: proprietario.id,
+                        nome_completo: proprietario.nome_completo,
+                        sexo: proprietario.sexo,
+                        data_nascimento: proprietario.data_nascimento
+                    };
+                    this.showProprietarioForm = true;
+                },
+
                 cancelarProprietarioForm() {
                     this.showProprietarioForm = false;
                     this.proprietarioForm = {
+                        id: null,
                         nome_completo: '',
                         sexo: '',
                         data_nascimento: ''
@@ -649,10 +674,16 @@
                 
                 async salvarVeiculo() {
                     try {
-                        await axios.post('/api/veiculos', this.veiculoForm);
-                        alert('Veículo salvo com sucesso!');
+                        if (this.veiculoForm.id) {
+                            await axios.put(`/api/veiculos/${this.veiculoForm.id}`, this.veiculoForm);
+                            alert('Veículo atualizado com sucesso!');
+                        } else {
+                            await axios.post('/api/veiculos', this.veiculoForm);
+                            alert('Veículo criado com sucesso!');
+                        }
                         this.cancelarVeiculoForm();
                         this.carregarVeiculos();
+                        this.carregarDashboard();
                     } catch (error) {
                         alert('Erro ao salvar veículo');
                         console.error(error);
@@ -672,9 +703,22 @@
                     }
                 },
                 
+                editarVeiculo(veiculo) {
+                    this.veiculoForm = {
+                        id: veiculo.id,
+                        proprietario_id: veiculo.proprietario_id,
+                        marca: veiculo.marca,
+                        modelo: veiculo.modelo,
+                        placa: veiculo.placa
+                    };
+                    this.showVeiculoForm = true;
+                    this.carregarProprietarios();
+                },
+
                 cancelarVeiculoForm() {
                     this.showVeiculoForm = false;
                     this.veiculoForm = {
+                        id: null,
                         proprietario_id: '',
                         marca: '',
                         modelo: '',
@@ -697,10 +741,16 @@
                 
                 async salvarRevisao() {
                     try {
-                        await axios.post('/api/revisoes', this.revisaoForm);
-                        alert('Revisão salva com sucesso!');
+                        if (this.revisaoForm.id) {
+                            await axios.put(`/api/revisoes/${this.revisaoForm.id}`, this.revisaoForm);
+                            alert('Revisão atualizada com sucesso!');
+                        } else {
+                            await axios.post('/api/revisoes', this.revisaoForm);
+                            alert('Revisão criada com sucesso!');
+                        }
                         this.cancelarRevisaoForm();
                         this.carregarRevisoes();
+                        this.carregarDashboard();
                     } catch (error) {
                         alert('Erro ao salvar revisão');
                         console.error(error);
@@ -720,9 +770,21 @@
                     }
                 },
                 
+                editarRevisao(revisao) {
+                    this.revisaoForm = {
+                        id: revisao.id,
+                        veiculo_id: revisao.veiculo_id,
+                        data_revisao: revisao.data_revisao,
+                        duracao_minutos: revisao.duracao_minutos
+                    };
+                    this.showRevisaoForm = true;
+                    this.carregarVeiculos();
+                },
+
                 cancelarRevisaoForm() {
                     this.showRevisaoForm = false;
                     this.revisaoForm = {
+                        id: null,
                         veiculo_id: '',
                         data_revisao: '',
                         duracao_minutos: ''

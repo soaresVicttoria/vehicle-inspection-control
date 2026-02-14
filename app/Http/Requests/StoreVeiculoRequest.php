@@ -22,7 +22,7 @@ class StoreVeiculoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proprietario_id' => 'required|exist:proprietarios,id',
+            'proprietario_id' => 'required|exists:proprietarios,id',
             'modelo' => 'required|string|max:255',
             'placa' => 'required|string|max:7|unique:veiculos,placa',
             'marca' => 'required|string|max:255'
